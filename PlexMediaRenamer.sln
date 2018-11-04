@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2035
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlexMediaRenamer", "PlexMediaRenamer\PlexMediaRenamer.csproj", "{83552C6F-A577-4BDB-AB9D-E9892F8A5FF6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{83552C6F-A577-4BDB-AB9D-E9892F8A5FF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83552C6F-A577-4BDB-AB9D-E9892F8A5FF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83552C6F-A577-4BDB-AB9D-E9892F8A5FF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83552C6F-A577-4BDB-AB9D-E9892F8A5FF6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {72AA596F-AF42-4556-BD7F-5EE9A2FC875E}
+	EndGlobalSection
+EndGlobal
