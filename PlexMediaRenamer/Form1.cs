@@ -83,7 +83,9 @@ namespace PlexMediaRenamer
         {
             string EpParser1 = "E";
             string EpParser2 = "EP";
-            string SParser = "S";
+            string SParser1 = "S0";
+            string SParser2 = "S";
+            bool FoundSeason = false;
             bool FoundPattern = false;
             DirectoryInfo BaseDir = new DirectoryInfo(AutoDirPath);
             FileInfo[] DirFiles = BaseDir.GetFiles();
@@ -93,15 +95,41 @@ namespace PlexMediaRenamer
             bool ConsistEp = false;
             int CorrectEp = 0;
             string EpMethod="";
+            string DoubleDigitEpMethod = "";
+            string SeasonMethod ="";
+            int NEpisodes = 0;
+            int SeasonNo = 0;
+            int CorrectSeason=0;
             foreach (FileInfo eachfile in DirFiles)
             {
+                bool WorkedInEp = false;
                 if (FirstEp == true)
                 {
                     FirstEp = false;
                 }
+            StartGetPattern:;
                 if (FoundEpisodesPattern == false)
                 {
-                    for (int count = 1; count < 11; count++)
+                    for (int count = 10; count < 99; count++)
+                    {
+                        if (eachfile.Name.Contains(EpParser1 + "" + count))
+                        {
+                            FoundEpisodesPattern = true;
+                            DoubleDigitEpMethod = "1,none";
+                        }
+                        if (eachfile.Name.Contains(EpParser2 + "" + count))
+                        {
+                            FoundEpisodesPattern = true;
+                            DoubleDigitEpMethod = "2,none";
+                        }
+
+                    }
+                    //MessageBox.Show("double digit ep method is " + DoubleDigitEpMethod);
+                    if (FoundEpisodesPattern == true)
+                    {
+                        goto EndGetPattern;
+                    }
+                    for (int count = 1; count < 10; count++)
                     {
                         if (eachfile.Name.Contains(EpParser1 + "0" + count))
                         {
@@ -123,7 +151,10 @@ namespace PlexMediaRenamer
                             FoundEpisodesPattern = true;
                             EpMethod = "2,none";
                         }
+                        
                     }
+                    //MessageBox.Show("ep pattern is " + EpMethod);
+                EndGetPattern:;
                 }
                 else
                 {
@@ -134,6 +165,7 @@ namespace PlexMediaRenamer
                             if(eachfile.Name.Contains(EpParser1 + "0" + count))
                             {
                                 CorrectEp = CorrectEp + 1;
+                                WorkedInEp = true;
                             }
                         }
                     }
@@ -144,6 +176,7 @@ namespace PlexMediaRenamer
                             if (eachfile.Name.Contains(EpParser1 + "" + count))
                             {
                                 CorrectEp = CorrectEp + 1;
+                                WorkedInEp = true;
                             }
                         }
                     }
@@ -154,6 +187,7 @@ namespace PlexMediaRenamer
                             if (eachfile.Name.Contains(EpParser2 + "0" + count))
                             {
                                 CorrectEp = CorrectEp + 1;
+                                WorkedInEp = true;
                             }
                         }
 
@@ -165,13 +199,209 @@ namespace PlexMediaRenamer
                             if (eachfile.Name.Contains(EpParser1 + "0" + count))
                             {
                                 CorrectEp = CorrectEp + 1;
+                                WorkedInEp = true;
                             }
                         }
+                    }
+                    if (DoubleDigitEpMethod == "1,none")
+                    {
+                        for(int count = 10; count < 100; count++)
+                        {
+                            if (eachfile.Name.Contains(EpParser1 + "" + count))
+                            {
+                                CorrectEp = CorrectEp + 1;
+                                WorkedInEp = true;
+                            }
+                        }
+                    }
+                    if (DoubleDigitEpMethod == "2,none")
+                    {
+                        for (int count = 10; count < 100; count++)
+                        {
+                            if (eachfile.Name.Contains(EpParser2 + "" + count))
+                            {
+                                CorrectEp = CorrectEp + 1;
+                                WorkedInEp = true;
+                            }
+                        }
+                    }
+                    if (WorkedInEp == false)
+                    {
+                       // MessageBox.Show("maybe >10 now..." + eachfile.Name);
+                        FoundEpisodesPattern = false;
+                        goto StartGetPattern;
                     }
                 }
                 
             }
-            MessageBox.Show(CorrectEp.ToString() + " " + EpMethod);
+            if (CorrectEp > 2)
+            {
+                foreach(FileInfo eachfile in DirFiles)
+                {
+                    bool AddedEpisode = false;
+                    if (DoubleDigitEpMethod == "1,none")
+                    {
+                       // MessageBox.Show("using 1,none double");
+                        for (int count = 10; count < 100; count++)
+                        {
+                            if (eachfile.Name.Contains(EpParser1 + "" + count))
+                            {
+                                NEpisodes = NEpisodes + 1;
+                                AddedEpisode = true;
+                                //MessageBox.Show("found ep " + eachfile.Name);
+                                //WorkedInEp = true;
+                            }
+                        }
+                    }
+                    if (DoubleDigitEpMethod == "2,none")
+                    {
+                        //MessageBox.Show("using 2,none double");
+                        for (int count = 10; count < 100; count++)
+                        {
+                            if (eachfile.Name.Contains(EpParser2 + "" + count))
+                            {
+                                NEpisodes = NEpisodes + 1;
+                                AddedEpisode = true;
+                                //MessageBox.Show("found ep " + eachfile.Name);
+                                //WorkedInEp = true;
+                            }
+                        }
+                    }
+                    if (AddedEpisode == true)
+                    {
+                        goto EndAddEpisode;
+                    }
+                    if (EpMethod == "1,0")
+                    {
+                        //MessageBox.Show("using 1,0 single");
+                        for (int count = 1; count < 10; count++)
+                        {
+                            if (eachfile.Name.Contains(EpParser1 + "0" + count))
+                            {
+                                NEpisodes = NEpisodes + 1;
+                                //MessageBox.Show("found ep " + eachfile.Name);
+                                //WorkedInEp = true;
+                            }
+                        }
+                    }
+                    if (EpMethod == "1,none")
+                    {
+                        //MessageBox.Show("using 1,none single");
+                        for (int count = 1; count < 10; count++)
+                        {
+                            if (eachfile.Name.Contains(EpParser1 + "" + count))
+                            {
+                                NEpisodes = NEpisodes + 1;
+                                //MessageBox.Show("found ep " + eachfile.Name);
+                                //WorkedInEp = true;
+                            }
+                        }
+                    }
+                    if (EpMethod == "2,0")
+                    {
+                        MessageBox.Show("using 2,0 single");
+                        for (int count = 1; count < 10; count++)
+                        {
+                            if (eachfile.Name.Contains(EpParser2 + "0" + count))
+                            {
+                                NEpisodes = NEpisodes + 1;
+                                //MessageBox.Show("found ep " + eachfile.Name);
+                                //WorkedInEp = true;
+                            }
+                        }
+                    }
+                    if (EpMethod == "2,none")
+                    {
+                        MessageBox.Show("using 2,none single");
+                        for (int count = 1; count < 10; count++)
+                        {
+                            if (eachfile.Name.Contains(EpParser2 + "" + count))
+                            {
+                                NEpisodes = NEpisodes + 1;
+                                //MessageBox.Show("found ep " + eachfile.Name);
+                                //WorkedInEp = true;
+                            }
+                        }
+                    }
+                EndAddEpisode:;
+                    
+                }
+            }
+            //MessageBox.Show(NEpisodes.ToString() + " " + EpMethod + " " + DoubleDigitEpMethod + " correct ep " + CorrectEp.ToString());
+            foreach(FileInfo eachfile in DirFiles)
+            {
+                if (FoundSeason == false)
+                {
+                    bool GotSeason = false;
+                    for(int count = 10; count < 99; count++)
+                    {
+                        if (eachfile.Name.Contains(SParser2 + count))
+                        {
+                            FoundSeason = true;
+                            SeasonMethod = "10+,2";
+                            GotSeason = true;
+                            SeasonNo = count;
+                        }
+                    }
+                    if (GotSeason == true)
+                    {
+                        goto EndFindSeason;
+                    }
+                    for(int count = 1; count < 10; count++)
+                    {
+                        if(eachfile.Name.Contains(SParser1 + count))
+                        {
+                            FoundSeason = true;
+                            SeasonMethod = "<10,1";
+                            SeasonNo = count;
+                        }
+                        if (eachfile.Name.Contains(SParser2 + count))
+                        {
+                            FoundSeason = true;
+                            SeasonMethod = "<10,2";
+                            SeasonNo = count;
+                        }
+                    }
+                EndFindSeason:;
+                }
+                else
+                {
+                    if (SeasonMethod == "10+,2")
+                    {
+                        for(int count = 10; count < 100; count++)
+                        {
+                            if(eachfile.Name.Contains(SParser2 + count))
+                            {
+                                CorrectSeason = CorrectSeason + 1;
+                            }
+                        }
+                    }
+                    if (SeasonMethod == "<10,1")
+                    {
+                        for (int count = 1; count < 10; count++)
+                        {
+                            if (eachfile.Name.Contains(SParser1 + count))
+                            {
+                                CorrectSeason = CorrectSeason + 1;
+                            }
+                        }
+                    }
+                    if (SeasonMethod == "<10,2")
+                    {
+                        for (int count = 1; count < 10; count++)
+                        {
+                            if (eachfile.Name.Contains(SParser2 + count))
+                            {
+                                CorrectSeason = CorrectSeason + 1;
+                            }
+                        }
+                    }
+                }
+            }
+            //MessageBox.Show("correct files with season: + 1 " + CorrectSeason.ToString() + ". This is season " + SeasonNo.ToString());
+            label12.Text = "Season: " + SeasonNo.ToString();
+            label13.Text = "No of episodes: " + NEpisodes.ToString();
+
         }
 
         private void button5_Click(object sender, EventArgs e)
